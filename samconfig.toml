@@ -2,7 +2,7 @@ version = 0.1
 [default.deploy.parameters]
 stack_name = "aws-pdf-encrypt-sample"
 resolve_s3 = true
-s3_prefix = "mocho"
+s3_prefix = "aws-pdf-encrypt-sample"
 region = "ap-northeast-1"
 profile = "mocho-admin"
 capabilities = "CAPABILITY_IAM"
