@@ -11,13 +11,13 @@ on:
 
 env:
   SAM_TEMPLATE: template.yaml
-  TESTING_STACK_NAME: aws-pdf-encrypt-dev
+  TESTING_STACK_NAME: pdf-encrypt-dev
   TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::415725062401:role/aws-sam-cli-managed-dev-pipel-PipelineExecutionRole-yOx5NbCuhjzY
   TESTING_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::415725062401:role/aws-sam-cli-managed-dev-p-CloudFormationExecutionRo-qHRF47mqkdS5
   TESTING_ARTIFACTS_BUCKET: aws-sam-cli-managed-dev-pipeline-r-artifactsbucket-cjc43zcpnm0f
   TESTING_IMAGE_REPOSITORY: 415725062401.dkr.ecr.ap-northeast-1.amazonaws.com/aws-sam-cli-managed-dev-pipeline-resources-imagerepository-ss6s8rsogv8i
   TESTING_REGION: ap-northeast-1
-  PROD_STACK_NAME: aws-pdf-encrypt-prod
+  PROD_STACK_NAME: pdf-encrypt-prod
   PROD_PIPELINE_EXECUTION_ROLE: arn:aws:iam::415725062401:role/aws-sam-cli-managed-prod-pipe-PipelineExecutionRole-JyvXzspQph1x
   PROD_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::415725062401:role/aws-sam-cli-managed-prod--CloudFormationExecutionRo-og7fUQNzejvg
   PROD_ARTIFACTS_BUCKET: aws-sam-cli-managed-prod-pipeline--artifactsbucket-p1z7s7cemtin
@@ -186,7 +186,7 @@ jobs:
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
             --image-repository ${TESTING_IMAGE_REPOSITORY} \
             --no-fail-on-empty-changeset \
-            #--role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE}
+            --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE}
 
   integration-test:
     if: github.ref == 'refs/heads/main'
