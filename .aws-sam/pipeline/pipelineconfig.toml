@@ -9,15 +9,15 @@ oidc_provider = "github-actions"
 permissions_provider = "OpenID Connect (OIDC)"
 
 [dev.pipeline_bootstrap.parameters]
-pipeline_execution_role = "arn:aws:iam::415725062401:role/aws-sam-cli-managed-dev-pipel-PipelineExecutionRole-yOx5NbCuhjzY"
-cloudformation_execution_role = "arn:aws:iam::415725062401:role/aws-sam-cli-managed-dev-p-CloudFormationExecutionRo-qHRF47mqkdS5"
-artifacts_bucket = "aws-sam-cli-managed-dev-pipeline-r-artifactsbucket-cjc43zcpnm0f"
-image_repository = "415725062401.dkr.ecr.ap-northeast-1.amazonaws.com/aws-sam-cli-managed-dev-pipeline-resources-imagerepository-ss6s8rsogv8i"
+pipeline_execution_role = "arn:aws:iam::415725062401:role/aws-sam-cli-managed-dev-pipel-PipelineExecutionRole-SQp73by0rIkQ"
+cloudformation_execution_role = "arn:aws:iam::415725062401:role/aws-sam-cli-managed-dev-p-CloudFormationExecutionRo-UcoXlqzFzvCW"
+artifacts_bucket = "aws-sam-cli-managed-dev-pipeline-r-artifactsbucket-gybxsylrx6lt"
+image_repository = "415725062401.dkr.ecr.ap-northeast-1.amazonaws.com/aws-sam-cli-managed-dev-pipeline-resources-imagerepository-lgr7xdjl7cud"
 region = "ap-northeast-1"
 
 [prod.pipeline_bootstrap.parameters]
-pipeline_execution_role = "arn:aws:iam::415725062401:role/aws-sam-cli-managed-prod-pipe-PipelineExecutionRole-JyvXzspQph1x"
-cloudformation_execution_role = "arn:aws:iam::415725062401:role/aws-sam-cli-managed-prod--CloudFormationExecutionRo-og7fUQNzejvg"
-artifacts_bucket = "aws-sam-cli-managed-prod-pipeline--artifactsbucket-p1z7s7cemtin"
-image_repository = "415725062401.dkr.ecr.ap-northeast-1.amazonaws.com/aws-sam-cli-managed-prod-pipeline-resources-imagerepository-0unnmtrrbzqw"
+pipeline_execution_role = "arn:aws:iam::415725062401:role/aws-sam-cli-managed-prod-pipe-PipelineExecutionRole-gUmMwcXZa5yf"
+cloudformation_execution_role = "arn:aws:iam::415725062401:role/aws-sam-cli-managed-prod--CloudFormationExecutionRo-pg9yuhYK2u3u"
+artifacts_bucket = "aws-sam-cli-managed-prod-pipeline--artifactsbucket-w1lu0ohiah36"
+image_repository = "415725062401.dkr.ecr.ap-northeast-1.amazonaws.com/aws-sam-cli-managed-prod-pipeline-resources-imagerepository-0ypuaade8ctf"
 region = "ap-northeast-1"
