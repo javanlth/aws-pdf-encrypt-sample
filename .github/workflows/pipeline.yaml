@@ -18,7 +18,7 @@ jobs:
       - uses: aws-actions/setup-sam@v2
       - uses: aws-actions/configure-aws-credentials@master
         with:
-	  role-to-assume: arn:aws:iam::{AWS_ACCOUNT_ID}:role/ExampleGithubRole
+	  role-to-assume: arn:aws:iam::${{ AWS_ACCOUNT_ID }}:role/ExampleGithubRole
           role-session-name: my-sso
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
