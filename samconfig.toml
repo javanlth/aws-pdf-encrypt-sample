@@ -1,10 +1,10 @@
 version = 0.1
 [default.deploy.parameters]
-stack_name = "sam-app"
+stack_name = "aws-pdf-encrypt-sample"
 resolve_s3 = true
-s3_prefix = "sam-app"
+s3_prefix = "mocho"
 region = "ap-northeast-1"
-profile = "mocho"
+profile = "mocho-admin"
 capabilities = "CAPABILITY_IAM"
 image_repositories = []
 disable_rollback = true
