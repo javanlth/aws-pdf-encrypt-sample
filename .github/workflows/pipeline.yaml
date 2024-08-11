@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v3
       - run: |
           # trigger the tests here
-          echo $AWS_PROFILE
+          echo ${{ env.AWS_PROFILE }}
 
   delete-feature:
     if: startsWith(github.event.ref, 'feature') && github.event_name == 'delete'
