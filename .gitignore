@@ -247,8 +247,7 @@ $RECYCLE.BIN/
 .aws-sam
 samconfig.toml
 target
-_pycache_
+__pycache__
 package
 .pytest_cache
-.venv
 trust-policy.json
