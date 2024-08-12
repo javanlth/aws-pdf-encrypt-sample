@@ -12,16 +12,16 @@ on:
 env:
   SAM_TEMPLATE: template.yaml
   TESTING_STACK_NAME: pdf-encrypt-dev
-  TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::415725062401:role/aws-sam-cli-managed-dev-pipel-PipelineExecutionRole-SQp73by0rIkQ
-  TESTING_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::415725062401:role/aws-sam-cli-managed-dev-p-CloudFormationExecutionRo-UcoXlqzFzvCW
-  TESTING_ARTIFACTS_BUCKET: aws-sam-cli-managed-dev-pipeline-r-artifactsbucket-gybxsylrx6lt
-  TESTING_IMAGE_REPOSITORY: 415725062401.dkr.ecr.ap-northeast-1.amazonaws.com/aws-sam-cli-managed-dev-pipeline-resources-imagerepository-lgr7xdjl7cud
+  TESTING_PIPELINE_EXECUTION_ROLE: ${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE }}
+  TESTING_CLOUDFORMATION_EXECUTION_ROLE: ${{ secrets.TESTING_CLOUDFORMATION_EXECUTION_ROLE }}
+  TESTING_ARTIFACTS_BUCKET: ${{ secrets.TESTING_ARTIFACTS_BUCKET }}
+  TESTING_IMAGE_REPOSITORY: ${{ secrets.TESTING_IMAGE_REPOSITORY }}
   TESTING_REGION: ap-northeast-1
   PROD_STACK_NAME: pdf-encrypt-prod
-  PROD_PIPELINE_EXECUTION_ROLE: arn:aws:iam::415725062401:role/aws-sam-cli-managed-prod-pipe-PipelineExecutionRole-gUmMwcXZa5yf
-  PROD_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::415725062401:role/aws-sam-cli-managed-prod--CloudFormationExecutionRo-pg9yuhYK2u3u
-  PROD_ARTIFACTS_BUCKET: aws-sam-cli-managed-prod-pipeline--artifactsbucket-w1lu0ohiah36
-  PROD_IMAGE_REPOSITORY: 415725062401.dkr.ecr.ap-northeast-1.amazonaws.com/aws-sam-cli-managed-prod-pipeline-resources-imagerepository-16fsdugk687l
+  PROD_PIPELINE_EXECUTION_ROLE: ${{ secrets.PROD_PIPELINE_EXECUTION_ROLE }}
+  PROD_CLOUDFORMATION_EXECUTION_ROLE: ${{ secrets.PROD_CLOUDFORMATION_EXECUTION_ROLE }}
+  PROD_ARTIFACTS_BUCKET: ${{ secrets.PROD_ARTIFACTS_BUCKET }}
+  PROD_IMAGE_REPOSITORY: ${{ secrets.PROD_IMAGE_REPOSITORY }}
   PROD_REGION: ap-northeast-1
 
 permissions:
@@ -32,10 +32,23 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
+      - name: create-json
+      uses: jsdaniell/create-json@1.1.2
+      with:
+          name: "notification.json"
+          json: '{
+		"LambdaFunctionConfigurations": [
+    				{
+      					"Id": "EncryptPDFEventConfiguration",
+     					 "LambdaFunctionArn": "${{ secrets.LambdaFunctionArn }}",
+      					"Events": [ "s3:ObjectCreated:Put" ]
+    				}
+  			]
+		}'
       - uses: actions/checkout@v3
       - run: |
           # trigger the tests here
-          echo ${{ env.AWS_PROFILE }}
+
 
   delete-feature:
     if: startsWith(github.event.ref, 'feature') && github.event_name == 'delete'
