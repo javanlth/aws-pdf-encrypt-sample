@@ -125,6 +125,20 @@ jobs:
         run: sam build --template ${SAM_TEMPLATE} --use-container
 
       - name: Assume the testing pipeline user role
+	env:
+          SAM_TEMPLATE: template.yaml
+          TESTING_STACK_NAME: pdf-encrypt-dev
+  	  TESTING_PIPELINE_EXECUTION_ROLE: ${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE }}
+  	  TESTING_CLOUDFORMATION_EXECUTION_ROLE: ${{ secrets.TESTING_CLOUDFORMATION_EXECUTION_ROLE }}
+  	  TESTING_ARTIFACTS_BUCKET: ${{ secrets.TESTING_ARTIFACTS_BUCKET }}
+ 	  TESTING_IMAGE_REPOSITORY: ${{ secrets.TESTING_IMAGE_REPOSITORY }}
+  	  TESTING_REGION: ap-northeast-1
+  	  PROD_STACK_NAME: pdf-encrypt-prod
+  	  PROD_PIPELINE_EXECUTION_ROLE: ${{ secrets.PROD_PIPELINE_EXECUTION_ROLE }}
+ 	  PROD_CLOUDFORMATION_EXECUTION_ROLE: ${{ secrets.PROD_CLOUDFORMATION_EXECUTION_ROLE }}
+ 	  PROD_ARTIFACTS_BUCKET: ${{ secrets.PROD_ARTIFACTS_BUCKET }}
+  	  PROD_IMAGE_REPOSITORY: ${{ secrets.PROD_IMAGE_REPOSITORY }}
+  	  PROD_REGION: ap-northeast-1
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-region: ${{ env.TESTING_REGION }}
