@@ -181,7 +181,7 @@ jobs:
 
   deploy-testing:
     #if: github.ref == 'refs/heads/main'
-    needs: [build-and-package]
+    needs: [build-and-package-for-prod]
     runs-on: ubuntu-latest
     env:
       user-role: dev
