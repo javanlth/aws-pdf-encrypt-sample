@@ -26,9 +26,9 @@ Resources:
   PDFSourceBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: ${user-role}-mocho
+      BucketName: !Sub "${user-role}-mocho"
 
   EncryptedPDFBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: ${user-role}-mocho-encrypted
+      BucketName: !Sub "${user-role}-mocho-encrypted"
