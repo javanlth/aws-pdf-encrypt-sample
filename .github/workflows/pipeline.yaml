@@ -153,7 +153,7 @@ jobs:
           use-installer: true
 
       - name: Build resources for prod
-	env:
+        env:
           user-role: prod
         run: sam build --template ${SAM_TEMPLATE} --use-container
 
