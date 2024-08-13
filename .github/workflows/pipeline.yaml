@@ -102,10 +102,12 @@ jobs:
             --no-fail-on-empty-changeset \
             --role-arn ${{ secrets.TESTING_CLOUDFORMATION_EXECUTION_ROLE }}
 
-  build-and-package:
+  build-and-package-for-dev:
     #if: github.ref == 'refs/heads/main'
     needs: [test]
     runs-on: ubuntu-latest
+    env:
+      user-role: dev
     steps:
       - uses: actions/checkout@v3
       - uses: aws-actions/setup-sam@v2
@@ -113,8 +115,7 @@ jobs:
           use-installer: true
 
       - name: Build resources for dev
-	env:
-          user-role: dev
+
         run: sam build --template ${SAM_TEMPLATE} --use-container
 
       - name: Assume the testing pipeline user role
@@ -138,6 +139,18 @@ jobs:
         with:
           name: packaged-testing.yaml
           path: packaged-testing.yaml
+
+  build-and-package-for-prod:
+    #if: github.ref == 'refs/heads/main'
+    needs: [build-and-package-for-dev]
+    runs-on: ubuntu-latest
+    env:
+      user-role: prod
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
 
       - name: Build resources for prod
 	env:
