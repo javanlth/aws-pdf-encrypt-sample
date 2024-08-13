@@ -20,7 +20,6 @@ jobs:
 
   build-and-package-for-dev:
     #if: github.ref == 'refs/heads/main'
-    needs: [test]
     runs-on: ubuntu-latest
     env:
       user-role: dev

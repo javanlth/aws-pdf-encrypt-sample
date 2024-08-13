@@ -24,7 +24,6 @@ jobs:
     # https://github.com/actions/setup-python
     # https://github.com/aws-actions/configure-aws-credentials#notice-node12-deprecation-warning
     if: startsWith(github.ref, 'refs/heads/feature')
-    needs: [test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -56,7 +55,6 @@ jobs:
 
   build-and-package-for-prod:
     #if: github.ref == 'refs/heads/main'
-    needs: [build-and-package-for-dev]
     runs-on: ubuntu-latest
     env:
       user-role: prod
