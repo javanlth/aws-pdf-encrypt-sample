@@ -112,7 +112,9 @@ jobs:
         with:
           use-installer: true
 
-      - name: Build resources
+      - name: Build resources for dev
+	env:
+          user-role: dev
         run: sam build --template ${SAM_TEMPLATE} --use-container
 
       - name: Assume the testing pipeline user role
@@ -136,6 +138,11 @@ jobs:
         with:
           name: packaged-testing.yaml
           path: packaged-testing.yaml
+
+      - name: Build resources for prod
+	env:
+          user-role: prod
+        run: sam build --template ${SAM_TEMPLATE} --use-container
 
       - name: Assume the prod pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
