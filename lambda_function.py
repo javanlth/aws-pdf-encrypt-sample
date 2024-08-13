@@ -3,6 +3,31 @@ import uuid
 import os
 from urllib.parse import unquote_plus
 import boto3
+from botocore.exceptions import ClientError
+
+
+def get_secret():
+
+    secret_name = "pdf-password"
+    region_name = "ap-northeast-1"
+
+    # Create a Secrets Manager client
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
+
+    try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+    except ClientError as e:
+        # For a list of exceptions thrown, see
+        # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
+        raise e
+
+    secret = get_secret_value_response['SecretString']
 
 # Create the S3 client to download and upload objects from S3
 s3_client = boto3.client('s3')
@@ -34,7 +59,7 @@ def encrypt_pdf(file_path, encrypted_file_path):
     # In this example, the password is hardcoded.
     # In a production application, don't hardcode passwords or other sensitive information.
     # We recommend you use AWS Secrets Manager to securely store passwords.
-    writer.encrypt("my-secret-password")
+    writer.encrypt(secret)
 
     # Save the new PDF to a file
     with open(encrypted_file_path, "wb") as file:

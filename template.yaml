@@ -5,7 +5,7 @@ Resources:
   EncryptPDFFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: EncryptPDF
+      FunctionName: !Sub "${AWS::StackName}-EncryptPDF"
       Architectures: [x86_64]
       CodeUri: ./
       Handler: lambda_function.lambda_handler
@@ -26,9 +26,9 @@ Resources:
   PDFSourceBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: mocho
+      BucketName: !Sub "${AWS::StackName}-mocho"
 
   EncryptedPDFBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: mocho-encrypted
+      BucketName: !Sub "${AWS::StackName}-mocho-encrypted"
