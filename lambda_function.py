@@ -59,6 +59,7 @@ def encrypt_pdf(file_path, encrypted_file_path):
     # In this example, the password is hardcoded.
     # In a production application, don't hardcode passwords or other sensitive information.
     # We recommend you use AWS Secrets Manager to securely store passwords.
+    secret = get_secret()
     writer.encrypt(secret)
 
     # Save the new PDF to a file

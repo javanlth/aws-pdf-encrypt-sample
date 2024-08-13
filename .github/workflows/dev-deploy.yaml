@@ -1,0 +1,93 @@
+name: Development Stage
+
+on:
+  workflow_run:
+    workflows: [Unit Test]
+    types:
+      -completed
+
+env:
+  SAM_TEMPLATE: template.yaml
+  TESTING_STACK_NAME: pdf-encrypt-dev
+  TESTING_REGION: ap-northeast-1
+  PROD_STACK_NAME: pdf-encrypt-prod
+  PROD_REGION: ap-northeast-1
+
+permissions:
+  id-token: write
+  contents: read
+jobs:
+
+  build-and-package-for-dev:
+    #if: github.ref == 'refs/heads/main'
+    needs: [test]
+    runs-on: ubuntu-latest
+    env:
+      user-role: dev
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+
+      - name: Build resources for dev
+
+        run: sam build --template ${SAM_TEMPLATE} --use-container
+
+      - name: Assume the testing pipeline user role
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-region: ${{ env.TESTING_REGION }}
+          role-to-assume: ${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: testing-packaging
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+      - name: Upload artifacts to testing artifact buckets
+        run: |
+          sam package \
+            --s3-bucket ${{ secrets.TESTING_ARTIFACTS_BUCKET }} \
+            --image-repository ${{ secrets.TESTING_IMAGE_REPOSITORY }} \
+            --region ${TESTING_REGION} \
+            --output-template-file packaged-testing.yaml
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: packaged-testing.yaml
+          path: packaged-testing.yaml
+
+
+  deploy-testing:
+    #if: github.ref == 'refs/heads/main'
+    needs: [build-and-package-for-prod]
+    runs-on: ubuntu-latest
+    env:
+      user-role: dev
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+      - uses: actions/download-artifact@v3
+        with:
+          name: packaged-testing.yaml
+
+      - name: Assume the testing pipeline user role
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-region: ${{ env.TESTING_REGION }}
+          role-to-assume: ${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: testing-deployment
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+      - name: Deploy to testing account
+        run: |
+          sam deploy --stack-name ${TESTING_STACK_NAME} \
+            --template packaged-testing.yaml \
+            --capabilities CAPABILITY_IAM \
+            --region ${TESTING_REGION} \
+            --s3-bucket ${{ secrets.TESTING_ARTIFACTS_BUCKET }} \
+            --image-repository ${{ secrets.TESTING_IMAGE_REPOSITORY }} \
+            --no-fail-on-empty-changeset \
+            --role-arn ${{ secrets.TESTING_CLOUDFORMATION_EXECUTION_ROLE }}

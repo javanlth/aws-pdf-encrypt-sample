@@ -1,0 +1,67 @@
+name: Unit Test
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'v3'
+      - 'feature**'
+  delete:
+    branches:
+      - 'feature**'
+
+
+
+env:
+  SAM_TEMPLATE: template.yaml
+  TESTING_STACK_NAME: pdf-encrypt-dev
+  TESTING_REGION: ap-northeast-1
+  PROD_STACK_NAME: pdf-encrypt-prod
+  PROD_REGION: ap-northeast-1
+
+permissions:
+  id-token: write
+  contents: read
+jobs:
+
+  test:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: create-json
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "notification.json"
+          json: '{"LambdaFunctionConfigurations": [{"Id": "EncryptPDFEventConfiguration","LambdaFunctionArn": "${{ secrets.LambdaFunctionArn }}","Events": [ "s3:ObjectCreated:Put"]}]}'
+      - uses: actions/checkout@v3
+      - name: bash test
+        shell: bash
+        run: |
+            # trigger the tests here
+
+  delete-feature:
+    if: startsWith(github.event.ref, 'feature') && github.event_name == 'delete'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+
+      - name: Assume the testing pipeline user role
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-region: ${{ env.TESTING_REGION }}
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: testing-packaging
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+      - name: Delete feature branch stack
+        env:
+          FEATURE_BRANCH_NAME: ${{ github.event.ref }}
+        run: |
+          sam delete \
+            --stack-name $(echo ${FEATURE_BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]') \
+            --region ${TESTING_REGION} \
+            --no-prompts
