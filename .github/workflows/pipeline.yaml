@@ -105,7 +105,6 @@ jobs:
   build-and-package:
     #if: github.ref == 'refs/heads/main'
     needs: [test]
-    environment: aws-pdf-encrypt-sample
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -164,6 +163,8 @@ jobs:
     #if: github.ref == 'refs/heads/main'
     needs: [build-and-package]
     runs-on: ubuntu-latest
+    env:
+      user-role: dev
     steps:
       - uses: actions/checkout@v3
       - uses: aws-actions/setup-sam@v2
@@ -209,6 +210,8 @@ jobs:
     # Configure GitHub Action Environment to have a manual approval step before deployment to production
     # https://docs.github.com/en/actions/reference/environments
     # environment: <configured-environment>
+    env:
+      user-role: prod
     steps:
       - uses: actions/checkout@v3
       - uses: aws-actions/setup-sam@v2
