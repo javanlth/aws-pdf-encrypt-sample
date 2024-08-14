@@ -3,8 +3,7 @@ name: Development Stage
 on:
   workflow_run:
     workflows: [Unit Test]
-    types:
-      -completed
+    types: [completed]
 
 env:
   SAM_TEMPLATE: template.yaml
