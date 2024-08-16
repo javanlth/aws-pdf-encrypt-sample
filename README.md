@@ -19,32 +19,32 @@ This presumes that you have already signed up for an AWS account and created an 
 
 To install the AWS CLI, refer to instructions at [https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html). Briefly, if you are installing it on a bash shell, you would run the following commands:
 
-'''
+```
 sudo yum remove awscli
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 sudo ./aws/install
-'''
+```
 
 Next, to configure your security credentials for AWS CLI, refer to  [https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html). Briefly, run the below command and follow the prompts for inputs.
 
-'''
+```
 aws configure sso
-'''
+```
 
 Finally, to install AWS SAM CLI, follow the instructions on [https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html).
 
 ### 3. Obtaining the ARNs and storing them as Github Repository Secrets.
 To obtain the various ARNs that will be needed for deploying the CI/CD pipeline, run the following AWS SAM commands:
 
-'''
+```
 sam pipeline bootstrap --stage dev
 sam pipeline bootstrap --stage prod
-'''
+```
 
 For each line of command, you will be guided through a series of prompts like this:
 
-'''
+```
 We will ask for [1] stage definition, [2] account details, and
 [3] references to existing resources in order to bootstrap these pipeline resources.
 
@@ -87,7 +87,7 @@ Does your application contain any IMAGE type Lambda functions? [y/N]: Y
 
 Once bootstrapping is complete, navigate to .aws-sam/pipeline and open the pipelineconfig.toml file. Here you will find the ARNs that AWS SAM has configured for you.
 
-'''
+```
 [dev.pipeline_bootstrap.parameters]
 pipeline_execution_role = "arn:aws:iam::<your account ID>:role/aws-sam-cli-managed-dev-pipel-PipelineExecutionRole-<some UID>"
 cloudformation_execution_role = "arn:aws:iam::<your account ID>:role/aws-sam-cli-managed-dev-p-CloudFormationExecutionRo-<some UID>"
@@ -101,7 +101,7 @@ cloudformation_execution_role = "arn:aws:iam::<your account ID>:role/aws-sam-cli
 artifacts_bucket = "aws-sam-cli-managed-prod-pipeline--artifactsbucket-<some UID>"
 image_repository = "<your account ID>.dkr.ecr.ap-northeast-1.amazonaws.com/aws-sam-cli-managed-prod-pipeline-resources-imagerepository-<some UID>"
 region = "ap-northeast-1"
-'''
+```
 
 These parameter values will be saved in your GitHub repository secrets for the workflow files to refer to later.
 
@@ -123,15 +123,15 @@ image_repository --> PROD_IMAGE_REPOSITORY
 
 Once the Lambda function has been successfully deployed onto the production stage of AWS, you may upload any PDF to the source S3 bucket by running the following command:
 
-'''
+```
 aws s3api put-object --bucket SOURCEBUCKET --key test.pdf --body ./test.pdf
-'''
+```
 
 The Lambda function has been configured to automatically run and encrypt the uploaded PDF, then upload the encrypted PDF into the destination S3 bucket. You may then download the encrypted PDF from the destination S3 bucket with the following command.
 
-'''
+```
 aws s3api get-object --bucket SOURCEBUCKET-encrypted --key test_encrypted.pdf my_encrypted_file.pdf
-'''
+```
 
 The encrypted file will have the -encrypted suffix in its name. When you open it, you should be prompted to enter a password, which will be the one you have configured in your AWS secrets manager.
 
