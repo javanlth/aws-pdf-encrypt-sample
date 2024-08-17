@@ -96,6 +96,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: install-aws-cli
+        uses: unfor19/install-aws-cli-action@v1
+
       - name: Test lambda function
         run: |
           # manual testing first
@@ -103,8 +106,6 @@ jobs:
           aws configure set default.aws_secret_access_key ${{ secrets.default_secret_key }}
           aws configure set default.region ap-northeast-1
 
-          # to fix Error 2: no such file or location
-          export AWS_CA_BUNDLE=/etc/ssl/certs/cacert.pem
 
           aws s3api put-object --bucket ${TESTING_STACK_NAME}-mocho --key test.pdf --body test.pdf --profile default
           #cd deploy_test
