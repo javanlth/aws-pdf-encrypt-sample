@@ -98,7 +98,7 @@ jobs:
           aws configure set default.region ap-northeast-1 --profile default
           aws configure set default.ca_bundle /path/to/ca-bundle.pem --profile default
 
-          aws s3api put-object --bucket ${TESTING_STACK_NAME}-mocho --key test.pdf --body TEST_PDF --profile default
+          aws s3api put-object --bucket ${TESTING_STACK_NAME}-mocho --key test.pdf --body ${TEST_PDF} --profile default
           #cd deploy_test
           #pip install pytest
           #pip install -r requirements.txt
