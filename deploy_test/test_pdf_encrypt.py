@@ -4,7 +4,8 @@ import pytest
 import time
 import os
 
-source_bucket_name = 'mocho'
+stack_name = 'pdf-encrypt-dev'
+source_bucket_name = stack_name + 'mocho'
 dest_bucket_name = source_bucket_name + '-encrypted'
 
 @pytest.fixture
@@ -29,13 +30,13 @@ def cleanup():
 
     # Delete test.pdf from the source bucket
     source_bucket = source_bucket_name
-    source_file_key = '../test.pdf'
+    source_file_key = 'test.pdf'
     s3_client.delete_object(Bucket=source_bucket, Key=source_file_key)
     print(f"\nDeleted {source_file_key} from {source_bucket}")
 
     # Delete test_encrypted.pdf from the destination bucket
     destination_bucket = dest_bucket_name
-    destination_file_key = '../test_encrypted.pdf'
+    destination_file_key = 'test_encrypted.pdf'
     s3_client.delete_object(Bucket=destination_bucket, Key=destination_file_key)
     print(f"Deleted {destination_file_key} from {destination_bucket}")
         
