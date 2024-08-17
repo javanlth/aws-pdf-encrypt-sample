@@ -104,6 +104,10 @@ jobs:
           aws configure set default.region ap-northeast-1
           aws configure set default.ca_bundle /path/to/ca-bundle.pem
 
+          # to fix Error 2: no such file or location
+          sudo update-ca-trust force-enable
+          sudo update-ca-trust extract
+
           aws s3api put-object --bucket ${TESTING_STACK_NAME}-mocho --key test.pdf --body test.pdf --profile default
           #cd deploy_test
           #pip install pytest
