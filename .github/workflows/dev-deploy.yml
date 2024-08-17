@@ -93,7 +93,7 @@ jobs:
         run: |
           # manual testing first
           aws s3api put-object --bucket ${TESTING_STACK_NAME}-mocho --key test.pdf --body ../test.pdf
-	  #cd deploy_test
+          #cd deploy_test
           #pip install pytest
           #pip install -r requirements.txt
           #pytest -s -v
