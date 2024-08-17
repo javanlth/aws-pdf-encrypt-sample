@@ -102,7 +102,6 @@ jobs:
           aws configure set default.aws_access_key_id ${{ secrets.default_access_key }} --profile default
           aws configure set default.aws_secret_access_key ${{ secrets.default_secret_key }} --profile default
           aws configure set default.region ap-northeast-1 --profile default
-          aws configure set default.ca_bundle /path/to/ca-bundle.pem --profile default
 
           aws s3api put-object --bucket ${TESTING_STACK_NAME}-mocho --key test.pdf --body test.pdf --profile default
           #cd deploy_test
