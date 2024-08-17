@@ -93,5 +93,6 @@ jobs:
         run: |
           cd deploy_test
           pip install pytest
+          pip install -r requirements.txt
           pytest -s -v
           cd ..
