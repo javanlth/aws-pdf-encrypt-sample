@@ -92,7 +92,12 @@ jobs:
       - name: Test lambda function
         run: |
           # manual testing first
-          aws s3api put-object --bucket arn:aws:s3:::${TESTING_STACK_NAME}-mocho --key test.pdf --body ./test.pdf
+          aws configure set aws_access_key_id ${{ secrets.default_access_key }}
+          aws configure set aws_secret_access_key ${{ secrets.default_secret_key }}
+          aws configure set default.region ap-northeast-1
+          aws configure set default.ca_bundle /path/to/ca-bundle.pem
+
+          aws s3api put-object --bucket ${TESTING_STACK_NAME}-mocho --key test.pdf --body ./test.pdf --profile
           #cd deploy_test
           #pip install pytest
           #pip install -r requirements.txt
