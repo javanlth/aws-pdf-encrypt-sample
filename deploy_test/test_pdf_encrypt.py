@@ -4,6 +4,9 @@ import pytest
 import time
 import os
 
+source_bucket_name = 'mocho'
+dest_bucket_name = source_bucket_name + '-encrypted'
+
 @pytest.fixture
 def lambda_client():
     return boto3.client('lambda')
@@ -25,13 +28,13 @@ def cleanup():
     # Cleanup code will be executed after all tests have finished
 
     # Delete test.pdf from the source bucket
-    source_bucket = 'mocho'
+    source_bucket = source_bucket_name
     source_file_key = 'test.pdf'
     s3_client.delete_object(Bucket=source_bucket, Key=source_file_key)
     print(f"\nDeleted {source_file_key} from {source_bucket}")
 
     # Delete test_encrypted.pdf from the destination bucket
-    destination_bucket = 'mocho-encrypted'
+    destination_bucket = dest_bucket_name
     destination_file_key = 'test_encrypted.pdf'
     s3_client.delete_object(Bucket=destination_bucket, Key=destination_file_key)
     print(f"Deleted {destination_file_key} from {destination_bucket}")
@@ -39,7 +42,7 @@ def cleanup():
 
 @pytest.mark.order(1)
 def test_source_bucket_available(s3_client):
-    s3_bucket_name = 'mocho'
+    s3_bucket_name = source_bucket_name
     file_name = 'test.pdf'
     file_path = os.path.join(os.path.dirname(__file__), file_name)
 
@@ -89,7 +92,7 @@ def test_lambda_invoked(logs_client):
 @pytest.mark.order(3)
 def test_encrypted_file_in_bucket(s3_client):
     # Specify the destination S3 bucket and the expected converted file key
-    destination_bucket = 'mocho-encrypted'
+    destination_bucket = dest_bucket_name
     converted_file_key = 'test_encrypted.pdf'
 
     try:

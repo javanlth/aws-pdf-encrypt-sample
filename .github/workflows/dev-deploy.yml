@@ -88,3 +88,10 @@ jobs:
             --image-repository ${{ secrets.TESTING_IMAGE_REPOSITORY }} \
             --no-fail-on-empty-changeset \
             --role-arn ${{ secrets.TESTING_CLOUDFORMATION_EXECUTION_ROLE }}
+
+      - name: Test lambda function
+        run: |
+          cd deploy_test
+          pip install pytest
+          pytest -s -v
+          cd ..
