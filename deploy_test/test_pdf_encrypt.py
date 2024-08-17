@@ -29,13 +29,13 @@ def cleanup():
 
     # Delete test.pdf from the source bucket
     source_bucket = source_bucket_name
-    source_file_key = 'test.pdf'
+    source_file_key = '../test.pdf'
     s3_client.delete_object(Bucket=source_bucket, Key=source_file_key)
     print(f"\nDeleted {source_file_key} from {source_bucket}")
 
     # Delete test_encrypted.pdf from the destination bucket
     destination_bucket = dest_bucket_name
-    destination_file_key = 'test_encrypted.pdf'
+    destination_file_key = '../test_encrypted.pdf'
     s3_client.delete_object(Bucket=destination_bucket, Key=destination_file_key)
     print(f"Deleted {destination_file_key} from {destination_bucket}")
         
@@ -43,7 +43,7 @@ def cleanup():
 @pytest.mark.order(1)
 def test_source_bucket_available(s3_client):
     s3_bucket_name = source_bucket_name
-    file_name = 'test.pdf'
+    file_name = '../test.pdf'
     file_path = os.path.join(os.path.dirname(__file__), file_name)
 
     file_uploaded = False
@@ -93,7 +93,7 @@ def test_lambda_invoked(logs_client):
 def test_encrypted_file_in_bucket(s3_client):
     # Specify the destination S3 bucket and the expected converted file key
     destination_bucket = dest_bucket_name
-    converted_file_key = 'test_encrypted.pdf'
+    converted_file_key = '../test_encrypted.pdf'
 
     try:
         # Attempt to retrieve the metadata of the converted file from the destination S3 bucket
