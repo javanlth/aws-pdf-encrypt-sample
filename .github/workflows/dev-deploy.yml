@@ -99,7 +99,7 @@ jobs:
       - name: install-aws-cli
         uses: unfor19/install-aws-cli-action@v1
 
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-region: ${{ env.TESTING_REGION }}
           role-to-assume: ${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE }}
