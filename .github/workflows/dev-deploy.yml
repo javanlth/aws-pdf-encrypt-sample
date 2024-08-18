@@ -17,7 +17,8 @@ permissions:
   id-token: write
   contents: read
 jobs:
-
+  env:
+    TESTING_PIPELINE_EXECUTION_ROLE: ${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE }}
   build-and-package-for-dev:
     #if: github.ref == 'refs/heads/main'
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -109,7 +110,7 @@ jobs:
 
       - name: Test lambda function
         run: |
-          aws iam attach-role-policy --role-name ${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE }} --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
+          aws iam attach-role-policy --role-name ${TESTING_PIPELINE_EXECUTION_ROLE} --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
           aws s3api put-object --bucket ${TESTING_STACK_NAME}-mocho --key test.pdf --body test.pdf
           #cd deploy_test
           #pip install pytest
