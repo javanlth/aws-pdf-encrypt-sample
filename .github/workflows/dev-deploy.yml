@@ -116,7 +116,8 @@ jobs:
           role-session-name: testing-deployment
           role-duration-seconds: 3600
           role-skip-session-tagging: true
-
+      - name: Test lambda function
+        run: |
           aws s3api put-object --bucket ${TESTING_STACK_NAME}-mocho --key test.pdf --body test.pdf --profile default
           #cd deploy_test
           #pip install pytest
