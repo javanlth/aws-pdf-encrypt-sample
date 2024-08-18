@@ -101,6 +101,11 @@ jobs:
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
+          aws-region: ${{ env.TESTING_REGION }}
+          role-to-assume: ${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: testing-deployment
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
           inline-session-policy: >-
            {
             "Version": "2012-10-17",
