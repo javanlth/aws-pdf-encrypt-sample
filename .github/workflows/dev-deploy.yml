@@ -17,8 +17,7 @@ permissions:
   id-token: write
   contents: read
 jobs:
-  env:
-    TESTING_PIPELINE_EXECUTION_ROLE: ${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE }}
+
   build-and-package-for-dev:
     #if: github.ref == 'refs/heads/main'
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -92,6 +91,8 @@ jobs:
             --role-arn ${{ secrets.TESTING_CLOUDFORMATION_EXECUTION_ROLE }}
 
   test-lambda-deployment:
+    env:
+      TESTING_PIPELINE_EXECUTION_ROLE: ${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE }}
     needs: [deploy-testing]
     runs-on: ubuntu-latest
     steps:
