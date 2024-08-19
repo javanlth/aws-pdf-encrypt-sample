@@ -104,9 +104,9 @@ jobs:
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
-          aws_access_key_id:${{ secrets.DEFAULT_ACCESS_KEY }}
-          aws_secret_access_key:${{ secrets.DEFAULT_SECRET_KEY }}
-          aws_session_token:${{ secrets.DEFAULT_SESSION_TOKEN }}
+          aws_access_key_id: ${{ secrets.DEFAULT_ACCESS_KEY }}
+          aws_secret_access_key: ${{ secrets.DEFAULT_SECRET_KEY }}
+          aws_session_token: ${{ secrets.DEFAULT_SESSION_TOKEN }}
 
       - name: Test lambda function
         run: |
