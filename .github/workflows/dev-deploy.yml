@@ -107,6 +107,7 @@ jobs:
           aws_access_key_id: ${{ secrets.DEFAULT_ACCESS_KEY }}
           aws_secret_access_key: ${{ secrets.DEFAULT_SECRET_KEY }}
           aws_session_token: ${{ secrets.DEFAULT_SESSION_TOKEN }}
+          aws-region: ${{ env.TESTING_REGION }}
 
       - name: Test lambda function
         run: |
