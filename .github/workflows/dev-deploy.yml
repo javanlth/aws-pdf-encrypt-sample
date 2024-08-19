@@ -101,18 +101,10 @@ jobs:
       - name: install-aws-cli
         uses: unfor19/install-aws-cli-action@v1
 
-      - uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-          aws-region: ${{ env.TESTING_REGION }}
-          role-to-assume: ${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE }}
-          role-session-name: testing-deployment
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
-
       - name: Test lambda function
-        env:
-          DEFAULT_ACCESS_KEY: "${{ secrets.DEFAULT_ACCESS_KEY }}"
-          DEFAULT_SECRET_KEY: "${{ secrets.DEFAULT_SECRET_KEY }}"
+        #env:
+          #DEFAULT_ACCESS_KEY: "${{ secrets.DEFAULT_ACCESS_KEY }}"
+          #DEFAULT_SECRET_KEY: "${{ secrets.DEFAULT_SECRET_KEY }}"
         run: |
           echo $AWS_SECRET_ACCESS_KEY
           echo $AWS_ACCESS_KEY_ID
