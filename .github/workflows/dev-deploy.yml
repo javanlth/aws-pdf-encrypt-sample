@@ -110,11 +110,14 @@ jobs:
           role-skip-session-tagging: true
 
       - name: Test lambda function
+        env:
+          DEFAULT_ACCESS_KEY = ${{ secrets.DEFAULT_ACCESS_KEY }}
+          DEFAULT_SECRET_KEY = ${{ secrets.DEFAULT_SECRET_KEY }}
         run: |
           CA_BUNDLE=$(python3 -m certifi)
           aws configure set aws_profile dev
-          aws configure set aws_access_key_id ${{ secrets.DEFAULT_ACCESS_KEY }} --profile dev
-          aws configure set aws_secret_access_key ${{ secrets.DEFAULT_SECRET_KEY }} --profile dev
+          aws configure set aws_access_key_id $DEFAULT_ACCESS_KEY --profile dev
+          aws configure set aws_secret_access_key $DEFAULT_SECRET_KEY --profile dev
           aws configure set region ap-northeast-1 --profile dev
           aws configure set ca_bundle $CA_BUNDLE --profile dev
  
