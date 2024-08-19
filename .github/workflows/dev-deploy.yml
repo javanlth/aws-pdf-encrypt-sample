@@ -111,8 +111,8 @@ jobs:
 
       - name: Test lambda function
         env:
-          DEFAULT_ACCESS_KEY = ${{ secrets.DEFAULT_ACCESS_KEY }}
-          DEFAULT_SECRET_KEY = ${{ secrets.DEFAULT_SECRET_KEY }}
+          DEFAULT_ACCESS_KEY: ${{ secrets.DEFAULT_ACCESS_KEY }}
+          DEFAULT_SECRET_KEY: ${{ secrets.DEFAULT_SECRET_KEY }}
         run: |
           CA_BUNDLE=$(python3 -m certifi)
           aws configure set aws_profile dev
