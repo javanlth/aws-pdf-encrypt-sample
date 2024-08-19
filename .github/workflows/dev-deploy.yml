@@ -108,7 +108,7 @@ jobs:
           aws_secret_access_key:${{ secrets.DEFAULT_SECRET_KEY }}
           aws_session_token:${{ secrets.DEFAULT_SESSION_TOKEN }}
 
-      - Test lambda function
+      - name: Test lambda function
         run: |
           #CA_BUNDLE=$(python3 -m certifi)
           #export AWS_PROFILE=dev
@@ -118,7 +118,7 @@ jobs:
           #aws configure set ca_bundle $CA_BUNDLE --profile dev
           #aws sts get-caller-identity
           #aws configure list
-          aws s3api put-object --bucket ${TESTING_STACK_NAME}-mocho --key test.pdf --body test.pdf --profile dev
+          aws s3api put-object --bucket ${TESTING_STACK_NAME}-mocho --key test.pdf --body test.pdf
           #cd deploy_test
           #pip install pytest
           #pip install -r requirements.txt
