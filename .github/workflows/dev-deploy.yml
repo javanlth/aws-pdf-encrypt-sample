@@ -102,11 +102,11 @@ jobs:
         uses: unfor19/install-aws-cli-action@v1
 
       - name: Test lambda function
-      - uses: keithweaver/aws-s3-github-action@v1.0.0
+        uses: keithweaver/aws-s3-github-action@v1.0.0
         with:
           command: cp
           source: ./test.pdf
-          destination: s3://yourbucket/folder/local_file.txt
+          destination: s3://${TESTING_STACK_NAME}-mocho/test.pdf
           aws_access_key_id: ${{ secrets.DEFAULT_ACCESS_KEY }}
           aws_secret_access_key: ${{ secrets.DEFAULT_ACCESS_KEY }}
           aws_region: ap-northeast-1        
