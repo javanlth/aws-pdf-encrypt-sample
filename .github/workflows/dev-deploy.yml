@@ -107,7 +107,7 @@ jobs:
           DEFAULT_SECRET_KEY: "${{ secrets.DEFAULT_SECRET_KEY }}"
         run: |
           CA_BUNDLE=$(python3 -m certifi)
-
+          export AWS_PROFILE=dev
           aws configure set aws_access_key_id $DEFAULT_ACCESS_KEY
           aws configure set aws_secret_access_key $DEFAULT_SECRET_KEY
           aws configure set region ap-northeast-1 
