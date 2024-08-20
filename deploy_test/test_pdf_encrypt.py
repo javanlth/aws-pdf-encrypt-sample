@@ -4,13 +4,13 @@ import pytest
 import time
 import os
 
-client = boto3.client('cloudformation')
-stacks = client.list_stacks(StackStatusFilter=['CREATE_COMPLETE', 'UPDATE_COMPLETE'])
+#client = boto3.client('cloudformation')
+#stacks = client.list_stacks(StackStatusFilter=['CREATE_COMPLETE', 'UPDATE_COMPLETE'])
 
-for stack in stacks['StackSummaries']:
-	stack_name = stack['StackName']
-	print(stack_name)
-
+#for stack in stacks['StackSummaries']:
+#	stack_name = stack['StackName']
+#	print(stack_name)
+stack_name = os.environ['TESTING_STACK_NAME']
 source_bucket_name = stack_name + 'mocho'
 dest_bucket_name = source_bucket_name + '-encrypted'
 
