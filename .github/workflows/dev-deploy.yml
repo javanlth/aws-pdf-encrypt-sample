@@ -113,7 +113,7 @@ jobs:
 
       - name: give deployment role full S3 access
         run: |
-          aws iam attach-role-policy --role-name "${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE }}" --policy-arn arn:aws:s3:::AmazonS3FullAccess
+          aws iam attach-role-policy --role-name "${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE_NAME }}" --policy-arn arn:aws:s3:::AmazonS3FullAccess
 
   test-lambda-deployment:
     needs: [give-s3-access]
