@@ -89,10 +89,26 @@ jobs:
             --no-fail-on-empty-changeset \
             --role-arn ${{ secrets.TESTING_CLOUDFORMATION_EXECUTION_ROLE }}
 
-  test-lambda-deployment:
-    env:
-      TESTING_PIPELINE_EXECUTION_ROLE: ${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE }}
+  give-s3-access:
     needs: [deploy-testing]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: install-aws-cli
+        uses: unfor19/install-aws-cli-action@v1
+
+      - name: Assume the CloudFormation role
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-region: ${{ env.TESTING_REGION }}
+          role-to-assume: ${{ secrets.TESTING_CLOUDFORMATION_EXECUTION_ROLE }}
+          role-session-name: give-s3-access
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+  test-lambda-deployment:
+    needs: [give-s3-access]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
