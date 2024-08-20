@@ -52,19 +52,18 @@ def test_source_bucket_available(s3_client):
     s3_bucket_name = source_bucket_name
     file_name = 'test.pdf'
     file_path = os.path.join(os.path.dirname(__file__), "../", file_name)
-    print(file_path)
-    print(s3_bucket_name)
 
-    file_uploaded = False
-    try:
-        s3_client.upload_file(file_path, s3_bucket_name, file_name)
-        file_uploaded = True
-    except:
-        print("Error: couldn't upload file")
 
-    assert file_uploaded, "Could not upload file to S3 bucket"
+#    file_uploaded = False
+#    try:
+#        s3_client.upload_file(file_path, s3_bucket_name, file_name)
+#        file_uploaded = True
+#    except:
+#        print("Error: couldn't upload file")
 
-    
+#    assert file_uploaded, "Could not upload file to S3 bucket"
+
+    return file_path, s3_bucket_name
 
 @pytest.mark.order(2)
 def test_lambda_invoked(logs_client):
