@@ -5,7 +5,7 @@ import time
 import os
 
 client = boto3.client('cloudformation')
-stacks = client.list_stacks(StackStatusFilter=['CREATE_COMPLETE', 'UPDATE_COMPLETE']
+stacks = client.list_stacks(StackStatusFilter=['CREATE_COMPLETE', 'UPDATE_COMPLETE'])
 
 for stack in stacks['StackSummaries']:
 	stack_name = stack['StackName']
