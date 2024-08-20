@@ -5,8 +5,11 @@ import time
 import os
 
 client = boto3.client('cloudformation')
-stack_name = client.describe_stack_set()
-print(stack_name)
+stacks = client.list_stacks(StackStatusFilter=['CREATE_COMPLETE', 'UPDATE_COMPLETE']
+
+for stack in stacks['StackSummaries']:
+	stack_name = stack['StackName']
+	print(stack_name)
 
 source_bucket_name = stack_name + 'mocho'
 dest_bucket_name = source_bucket_name + '-encrypted'
