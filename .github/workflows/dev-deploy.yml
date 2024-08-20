@@ -120,7 +120,7 @@ jobs:
 
 
   test-lambda-deployment:
-    needs: [give-s3-access]
+    needs: [give-policy-access]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
