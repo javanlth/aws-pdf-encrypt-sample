@@ -57,7 +57,6 @@ jobs:
 
   deploy-testing:
     #if: github.ref == 'refs/heads/main'
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     needs: [build-and-package-for-dev]
     runs-on: ubuntu-latest
     steps:
@@ -89,7 +88,7 @@ jobs:
             --no-fail-on-empty-changeset \
             --role-arn ${{ secrets.TESTING_CLOUDFORMATION_EXECUTION_ROLE }}
 
-  give-s3-access:
+  give-policy-access:
     needs: [deploy-testing]
     runs-on: ubuntu-latest
     steps:
@@ -114,6 +113,10 @@ jobs:
       - name: give deployment role full S3 access
         run: |
           aws iam attach-role-policy --role-name "${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE_NAME }}" --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
+
+      - name: give deployment role full Cloud Watch Logs access
+        run: |
+          aws iam attach-role-policy --role-name "${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE_NAME }}" --policy-arn arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
 
 
   test-lambda-deployment:
