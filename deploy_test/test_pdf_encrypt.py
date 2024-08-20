@@ -52,6 +52,8 @@ def test_source_bucket_available(s3_client):
     s3_bucket_name = source_bucket_name
     file_name = 'test.pdf'
     file_path = os.path.join(os.path.dirname(__file__), "../", file_name)
+    print(file_path)
+    print(s3_bucket_name)
 
     file_uploaded = False
     try:
