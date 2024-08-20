@@ -4,8 +4,8 @@ import pytest
 import time
 import os
 
-cloudformation = boto3.resource('cloudformation')
-stack_name = cloudformation.Stack.stack_name
+client = boto3.client('cloudformation')
+stack_name = client.describe_stack_set()
 print(stack_name)
 
 source_bucket_name = stack_name + 'mocho'
