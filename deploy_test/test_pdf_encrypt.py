@@ -4,7 +4,10 @@ import pytest
 import time
 import os
 
-stack_name = 'pdf-encrypt-dev'
+cloudformation = boto3.resource('cloudformation')
+stack_name = cloudformation.Stack.stack_name
+print(stack_name)
+
 source_bucket_name = stack_name + 'mocho'
 dest_bucket_name = source_bucket_name + '-encrypted'
 
