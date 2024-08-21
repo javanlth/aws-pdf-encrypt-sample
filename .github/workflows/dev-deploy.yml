@@ -138,10 +138,6 @@ jobs:
             --source-account ${{ secrets.AWS_ACCOUNT_ID }}) || \
             (echo "Permission already added")
 
-      - name: Give Lambda Function access rights to AWS secretsmanager
-        run: |
-          aws iam attach-role-policy --role-name "${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE_NAME }}" --policy-arn arn:aws:iam::aws:policy/SecretsManagerReadWrite
-
       - name: Configure notification by S3 bucket to Lambda Function
         run: |
           aws s3api put-bucket-notification-configuration --bucket ${TESTING_STACK_NAME}-mocho \
