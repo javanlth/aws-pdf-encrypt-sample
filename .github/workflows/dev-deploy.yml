@@ -18,7 +18,8 @@ permissions:
 jobs:
 
   give-policy-access:
-    needs: [deploy-testing]
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -53,7 +54,7 @@ jobs:
 
   build-and-package-for-dev:
     #if: github.ref == 'refs/heads/main'
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    needs: [give-policy-access]
     runs-on: ubuntu-latest
 
     steps:
@@ -133,7 +134,7 @@ jobs:
 
 
   test-lambda-deployment:
-    needs: [give-policy-access]
+    needs: [deploy-testing]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
