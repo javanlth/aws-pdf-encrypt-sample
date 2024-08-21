@@ -16,6 +16,7 @@ Resources:
         LogFormat: JSON
       Policies:
         - AmazonS3FullAccess
+        - SecretsManagerReadWrite
       Events:
         S3Event:
           Type: S3
