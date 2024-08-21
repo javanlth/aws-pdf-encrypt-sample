@@ -4,7 +4,9 @@ import os
 from urllib.parse import unquote_plus
 import boto3
 from botocore.exceptions import ClientError
+import logging
 
+logger = logging.getLogger(__name__)
 
 def get_secret():
 
@@ -28,7 +30,7 @@ def get_secret():
         raise e
 
     try:
-        secret = get_secret_value_response["pdf-password"]
+        secret = get_secret_value_response["SecretString"]["pdf-password"]
     except KeyError:
         print(get_secret_value_response)
     return secret
