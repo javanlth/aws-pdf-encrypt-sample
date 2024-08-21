@@ -131,6 +131,12 @@ jobs:
             --source-account ${{ secrets.AWS_ACCOUNT_ID }}) || \
             (echo "Permission already added")
 
+      - name: create-json
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "notification.json"
+          json: '{"LambdaFunctionConfigurations": [{"Id": "EncryptPDFEventConfiguration","LambdaFunctionArn": "${{ secrets.LambdaFunctionArn }}","Events": [ "s3:ObjectCreated:Put"]}]}'
+
       - name: Configure notification by S3 bucket to Lambda Function
         run: |
           aws s3api put-bucket-notification-configuration --bucket ${TESTING_STACK_NAME}-mocho \

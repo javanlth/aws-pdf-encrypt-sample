@@ -28,11 +28,7 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - name: create-json
-        uses: jsdaniell/create-json@1.1.2
-        with:
-          name: "notification.json"
-          json: '{"LambdaFunctionConfigurations": [{"Id": "EncryptPDFEventConfiguration","LambdaFunctionArn": "${{ secrets.LambdaFunctionArn }}","Events": [ "s3:ObjectCreated:Put"]}]}'
+
       - uses: actions/checkout@v3
       - name: bash test
         shell: bash
