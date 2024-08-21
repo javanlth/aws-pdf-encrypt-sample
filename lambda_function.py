@@ -44,7 +44,7 @@ def lambda_handler(event, context):
         # If the file is a PDF, encrypt it and upload it to the destination S3 bucket
         if key.lower().endswith('.pdf'):
             s3_client.download_file(bucket, key, download_path)
-            secret = get_secret()
+            secret = 'hello' #get_secret()
             encrypt_pdf(download_path, upload_path, secret)
             encrypted_key = add_encrypted_suffix(key)
             s3_client.upload_file(upload_path, f'{bucket}-encrypted', encrypted_key)
