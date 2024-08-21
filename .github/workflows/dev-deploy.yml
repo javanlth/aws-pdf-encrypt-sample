@@ -125,10 +125,11 @@ jobs:
 
       - name: Configure trigger for Lambda Function
         run: |
-          aws lambda add-permission --function-name ${TESTING_STACK_NAME}-EncryptPDF \
+          (aws lambda add-permission --function-name ${TESTING_STACK_NAME}-EncryptPDF \
             --principal s3.amazonaws.com --statement-id s3invoke --action "lambda:InvokeFunction" \
             --source-arn arn:aws:s3:::${TESTING_STACK_NAME}-mocho \
-            --source-account ${{ secrets.AWS_ACCOUNT_ID }}
+            --source-account ${{ secrets.AWS_ACCOUNT_ID }}) || \
+            (echo "Permission already added")
 
       - name: Configure notification by S3 bucket to Lambda Function
         run: |
