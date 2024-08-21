@@ -251,4 +251,3 @@ __pycache__
 package
 .pytest_cache
 trust-policy.json
-notification.json

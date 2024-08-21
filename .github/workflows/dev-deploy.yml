@@ -130,6 +130,11 @@ jobs:
             --source-arn arn:aws:s3:::${TESTING_STACK_NAME}-mocho \
             --source-account ${{ secrets.AWS_ACCOUNT_ID }}
 
+      - name: Configure notification by S3 bucket to Lambda Function
+        run: |
+          aws s3api put-bucket-notification-configuration --bucket ${TESTING_STACK_NAME}-mocho \
+            --notification-configuration file://notification.json
+
 
 
 
