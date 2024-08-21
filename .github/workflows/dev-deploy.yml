@@ -131,11 +131,6 @@ jobs:
             --source-account ${{ secrets.AWS_ACCOUNT_ID }}) || \
             (echo "Permission already added")
 
-
-      - name: check json file
-        run: |
-          jq notification.json
-
       - name: Configure notification by S3 bucket to Lambda Function
         run: |
           aws s3api put-bucket-notification-configuration --bucket ${TESTING_STACK_NAME}-mocho \
