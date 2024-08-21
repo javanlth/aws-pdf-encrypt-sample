@@ -88,14 +88,21 @@ jobs:
             --no-fail-on-empty-changeset \
             --role-arn ${{ secrets.TESTING_CLOUDFORMATION_EXECUTION_ROLE }}
 
+      - name: Configure trigger for Lambda Function
+        run: |
+          aws lambda add-permission --function-name EncryptPDF \
+            --principal s3.amazonaws.com --statement-id s3invoke --action "lambda:InvokeFunction" \
+            --source-arn arn:aws:s3:::${TESTING_STACK_NAME}-mocho \
+            --source-account ${{ secrets.AWS_ACCOUNT_ID }}
+
   give-policy-access:
     needs: [deploy-testing]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
-      - name: install-aws-cli
-        uses: unfor19/install-aws-cli-action@v1
+      #- name: install-aws-cli
+      #  uses: unfor19/install-aws-cli-action@v1
 
       - name: Assume the CloudFormation role
         uses: aws-actions/configure-aws-credentials@v1-node16
