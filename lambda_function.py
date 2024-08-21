@@ -22,18 +22,17 @@ def get_secret():
     )
 
     try:
-        get_secret_value_response = json.loads(
-            client.get_secret_value(
+        get_secret_value_response = client.get_secret_value(
                 SecretId=secret_name
                 )
-        )
     except ClientError as e:
         # For a list of exceptions thrown, see
         # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
         raise e
 
     try:
-        secret = get_secret_value_response["SecretString"]["pdf-password"]
+        secret_dict = json.loads(get_secret_value_response["SecretString"])
+        secret = secret_dict["pdf-password"]
     except KeyError:
         print(get_secret_value_response)
     return secret
