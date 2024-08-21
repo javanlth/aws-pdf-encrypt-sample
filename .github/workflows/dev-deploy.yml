@@ -135,7 +135,11 @@ jobs:
         uses: jsdaniell/create-json@1.1.2
         with:
           name: "notification.json"
-          json: '{"LambdaFunctionConfigurations": [{"Id": "EncryptPDFEventConfiguration","LambdaFunctionArn": "${{ secrets.LambdaFunctionArn }}","Events": [ "s3:ObjectCreated:Put"]}]}'
+          json: '{"LambdaFunctionConfigurations": [{"Id": "EncryptPDFEventConfiguration","LambdaFunctionArn": "${{ secrets.LambdaFunctionArn }}","Events": ["s3:ObjectCreated:Put"]}]}'
+
+      - name: list files
+        run: |
+          ls
 
       - name: Configure notification by S3 bucket to Lambda Function
         run: |
