@@ -134,7 +134,7 @@ jobs:
       - name: Configure notification by S3 bucket to Lambda Function
         run: |
           aws s3api put-bucket-notification-configuration --bucket ${TESTING_STACK_NAME}-mocho \
-            --notification-configuration '{"LambdaFunctionConfigurations": [{"Id": "EncryptPDFEventConfiguration","LambdaFunctionArn": "${{ secrets.LambdaFunctionArn }}","Events": ["s3:ObjectCreated:Put"]}]}'
+            --notification-configuration {"LambdaFunctionConfigurations": [{"Id": "EncryptPDFEventConfiguration","LambdaFunctionArn": "${{ secrets.LambdaFunctionArn }}","Events": "s3:ObjectCreated:Put"]}]}
 
 
 
