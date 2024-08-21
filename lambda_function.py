@@ -5,6 +5,7 @@ from urllib.parse import unquote_plus
 import boto3
 from botocore.exceptions import ClientError
 import logging
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -21,8 +22,10 @@ def get_secret():
     )
 
     try:
-        get_secret_value_response = client.get_secret_value(
-            SecretId=secret_name
+        get_secret_value_response = json.loads(
+            client.get_secret_value(
+                SecretId=secret_name
+                )
         )
     except ClientError as e:
         # For a list of exceptions thrown, see
