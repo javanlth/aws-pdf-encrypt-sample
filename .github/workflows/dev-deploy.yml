@@ -137,9 +137,9 @@ jobs:
           name: "notification.json"
           json: '{"LambdaFunctionConfigurations": [{"Id": "EncryptPDFEventConfiguration","LambdaFunctionArn": "${{ secrets.LambdaFunctionArn }}","Events": ["s3:ObjectCreated:Put"]}]}'
 
-      - name: list files
+      - name: check json file
         run: |
-          ls
+          jq notification.json
 
       - name: Configure notification by S3 bucket to Lambda Function
         run: |
