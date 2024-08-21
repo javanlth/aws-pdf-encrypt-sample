@@ -27,7 +27,10 @@ def get_secret():
         # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
         raise e
 
-    secret = get_secret_value_response["pdf-password"]
+    try:
+        secret = get_secret_value_response["pdf-password"]
+    except KeyError:
+        print(get_secret_value_response)
     return secret
 
 # Create the S3 client to download and upload objects from S3
@@ -45,7 +48,6 @@ def lambda_handler(event, context):
         if key.lower().endswith('.pdf'):
             s3_client.download_file(bucket, key, download_path)
             secret = get_secret()
-            print(secret)
             encrypt_pdf(download_path, upload_path, secret)
             encrypted_key = add_encrypted_suffix(key)
             s3_client.upload_file(upload_path, f'{bucket}-encrypted', encrypted_key)
