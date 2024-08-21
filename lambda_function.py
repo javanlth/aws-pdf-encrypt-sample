@@ -27,7 +27,7 @@ def get_secret():
         # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
         raise e
 
-    secret = get_secret_value_response['pdf-password']
+    secret = get_secret_value_response["pdf-password"]
     return secret
 
 # Create the S3 client to download and upload objects from S3
