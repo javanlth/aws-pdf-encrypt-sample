@@ -17,6 +17,40 @@ permissions:
   contents: read
 jobs:
 
+  give-policy-access:
+    needs: [deploy-testing]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      #- name: install-aws-cli
+      #  uses: unfor19/install-aws-cli-action@v1
+
+      - name: Assume the CloudFormation role
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-region: ${{ env.TESTING_REGION }}
+          role-to-assume: ${{ secrets.TESTING_CLOUDFORMATION_EXECUTION_ROLE }}
+          role-session-name: give-s3-access
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+      - name: check caller identity
+        run: |
+          aws sts get-caller-identity
+
+      - name: give deployment role full S3 access
+        run: |
+          aws iam attach-role-policy --role-name "${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE_NAME }}" --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
+
+      - name: give deployment role full Cloud Watch Logs access
+        run: |
+          aws iam attach-role-policy --role-name "${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE_NAME }}" --policy-arn arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+
+      - name: give deployment role full Lambda access
+        run: |
+          aws iam attach-role-policy --role-name "${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE_NAME }}" --policy-arn arn:aws:iam::aws:policy/AWSLambda_FullAccess
+
   build-and-package-for-dev:
     #if: github.ref == 'refs/heads/main'
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -95,35 +129,7 @@ jobs:
             --source-arn arn:aws:s3:::${TESTING_STACK_NAME}-mocho \
             --source-account ${{ secrets.AWS_ACCOUNT_ID }}
 
-  give-policy-access:
-    needs: [deploy-testing]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
 
-      #- name: install-aws-cli
-      #  uses: unfor19/install-aws-cli-action@v1
-
-      - name: Assume the CloudFormation role
-        uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-          aws-region: ${{ env.TESTING_REGION }}
-          role-to-assume: ${{ secrets.TESTING_CLOUDFORMATION_EXECUTION_ROLE }}
-          role-session-name: give-s3-access
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
-
-      - name: check caller identity
-        run: |
-          aws sts get-caller-identity
-
-      - name: give deployment role full S3 access
-        run: |
-          aws iam attach-role-policy --role-name "${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE_NAME }}" --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
-
-      - name: give deployment role full Cloud Watch Logs access
-        run: |
-          aws iam attach-role-policy --role-name "${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE_NAME }}" --policy-arn arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
 
 
   test-lambda-deployment:
