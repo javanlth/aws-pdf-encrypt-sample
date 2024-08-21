@@ -28,6 +28,7 @@ def get_secret():
         raise e
 
     secret = get_secret_value_response['SecretString']
+    return secret
 
 # Create the S3 client to download and upload objects from S3
 s3_client = boto3.client('s3')
@@ -43,12 +44,13 @@ def lambda_handler(event, context):
         # If the file is a PDF, encrypt it and upload it to the destination S3 bucket
         if key.lower().endswith('.pdf'):
             s3_client.download_file(bucket, key, download_path)
-            encrypt_pdf(download_path, upload_path)
+            secret = get_secret()
+            encrypt_pdf(download_path, upload_path, secret)
             encrypted_key = add_encrypted_suffix(key)
             s3_client.upload_file(upload_path, f'{bucket}-encrypted', encrypted_key)
 
 # Define the function to encrypt the PDF file with a password
-def encrypt_pdf(file_path, encrypted_file_path):
+def encrypt_pdf(file_path, encrypted_file_path, secret):
     reader = PdfReader(file_path)
     writer = PdfWriter()
     
@@ -59,7 +61,7 @@ def encrypt_pdf(file_path, encrypted_file_path):
     # In this example, the password is hardcoded.
     # In a production application, don't hardcode passwords or other sensitive information.
     # We recommend you use AWS Secrets Manager to securely store passwords.
-    secret = get_secret()
+    
     writer.encrypt(secret)
 
     # Save the new PDF to a file
