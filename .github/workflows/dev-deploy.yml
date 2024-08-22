@@ -1,0 +1,174 @@
+name: Development Stage
+
+on:
+  workflow_run:
+    workflows: [Unit Test]
+    types: [completed]
+
+env:
+  SAM_TEMPLATE: template.yaml
+  TESTING_STACK_NAME: pdf-encrypt-dev
+  TESTING_REGION: ap-northeast-1
+  TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE_NAME }}
+  TESTING_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.TESTING_CLOUDFORMATION_EXECUTION_ROLE_NAME }}
+
+permissions:
+  id-token: write
+  contents: read
+jobs:
+
+  give-policy-access:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      #- name: install-aws-cli
+      #  uses: unfor19/install-aws-cli-action@v1
+
+      - name: Assume the CloudFormation role
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-region: ${{ env.TESTING_REGION }}
+          role-to-assume: ${{ env.TESTING_CLOUDFORMATION_EXECUTION_ROLE }}
+          role-session-name: give-s3-access
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+      - name: check caller identity
+        run: |
+          aws sts get-caller-identity
+
+      - name: give deployment role full S3 access
+        run: |
+          aws iam attach-role-policy --role-name "${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE_NAME }}" --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
+
+      - name: give deployment role full Cloud Watch Logs access
+        run: |
+          aws iam attach-role-policy --role-name "${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE_NAME }}" --policy-arn arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+
+      - name: give deployment role full Lambda access
+        run: |
+          aws iam attach-role-policy --role-name "${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE_NAME }}" --policy-arn arn:aws:iam::aws:policy/AWSLambda_FullAccess
+
+  build-and-package-for-dev:
+    #if: github.ref == 'refs/heads/main'
+    needs: [give-policy-access]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+
+      - name: Build resources for dev
+
+        run: sam build --template ${SAM_TEMPLATE} --use-container
+
+      - name: Assume the testing pipeline user role
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-region: ${{ env.TESTING_REGION }}
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: testing-packaging
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+      - name: Upload artifacts to testing artifact buckets
+        run: |
+          sam package \
+            --s3-bucket ${{ secrets.TESTING_ARTIFACTS_BUCKET }} \
+            --image-repository ${{ secrets.TESTING_IMAGE_REPOSITORY }} \
+            --region ${TESTING_REGION} \
+            --output-template-file packaged-testing.yaml
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: packaged-testing.yaml
+          path: packaged-testing.yaml
+
+
+  deploy-testing:
+    #if: github.ref == 'refs/heads/main'
+    needs: [build-and-package-for-dev]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+      - uses: actions/download-artifact@v3
+        with:
+          name: packaged-testing.yaml
+
+      - name: Assume the testing pipeline user role
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-region: ${{ env.TESTING_REGION }}
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: testing-deployment
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+      - name: Deploy to testing account
+        run: |
+          sam deploy --stack-name ${TESTING_STACK_NAME} \
+            --template packaged-testing.yaml \
+            --capabilities CAPABILITY_IAM \
+            --region ${TESTING_REGION} \
+            --s3-bucket ${{ secrets.TESTING_ARTIFACTS_BUCKET }} \
+            --image-repository ${{ secrets.TESTING_IMAGE_REPOSITORY }} \
+            --no-fail-on-empty-changeset \
+            --role-arn ${{ env.TESTING_CLOUDFORMATION_EXECUTION_ROLE }}
+
+      - name: create-json
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "notification.json"
+          json: '{"LambdaFunctionConfigurations": [{"Id": "EncryptPDFEventConfiguration","LambdaFunctionArn": "arn:aws:lambda:${{ env.TESTING_REGION }}:${{ secrets.AWS_ACCOUNT_ID }}:function:${{ env.TESTING_STACK_NAME }}-EncryptPDF","Events": ["s3:ObjectCreated:Put"]}]}'
+
+
+      - name: Give Lambda Function access rights to source S3 bucket
+        run: |
+          (aws lambda add-permission --function-name ${TESTING_STACK_NAME}-EncryptPDF \
+            --principal s3.amazonaws.com --statement-id s3invoke --action "lambda:InvokeFunction" \
+            --source-arn arn:aws:s3:::${TESTING_STACK_NAME}-mocho \
+            --source-account ${{ secrets.AWS_ACCOUNT_ID }}) || \
+            (echo "Permission already added")
+
+      - name: Configure notification by S3 bucket to Lambda Function
+        run: |
+          aws s3api put-bucket-notification-configuration --bucket ${TESTING_STACK_NAME}-mocho \
+            --notification-configuration file://notification.json
+
+
+
+  test-lambda-deployment:
+    needs: [deploy-testing]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: install-aws-cli
+        uses: unfor19/install-aws-cli-action@v1
+ 
+      - name: Assume the testing pipeline user role
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-region: ${{ env.TESTING_REGION }}
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: testing-deployment
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+      - name: Test lambda function
+        run: |
+
+          #aws s3api put-object --bucket ${TESTING_STACK_NAME}-mocho --key test.pdf --body test.pdf
+          cd deploy_test
+          pip install pytest
+          pip install -r requirements.txt
+          pytest -s -v
+          cd ..

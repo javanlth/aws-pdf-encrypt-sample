@@ -4,7 +4,10 @@ import os
 from urllib.parse import unquote_plus
 import boto3
 from botocore.exceptions import ClientError
+import logging
+import json
 
+logger = logging.getLogger(__name__)
 
 def get_secret():
 
@@ -20,14 +23,19 @@ def get_secret():
 
     try:
         get_secret_value_response = client.get_secret_value(
-            SecretId=secret_name
-        )
+                SecretId=secret_name
+                )
     except ClientError as e:
         # For a list of exceptions thrown, see
         # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
         raise e
 
-    secret = get_secret_value_response['SecretString']
+    try:
+        secret_dict = json.loads(get_secret_value_response["SecretString"])
+        secret = secret_dict["pdf-password"]
+    except KeyError:
+        print(get_secret_value_response)
+    return secret
 
 # Create the S3 client to download and upload objects from S3
 s3_client = boto3.client('s3')
@@ -43,12 +51,13 @@ def lambda_handler(event, context):
         # If the file is a PDF, encrypt it and upload it to the destination S3 bucket
         if key.lower().endswith('.pdf'):
             s3_client.download_file(bucket, key, download_path)
-            encrypt_pdf(download_path, upload_path)
+            secret = get_secret()
+            encrypt_pdf(download_path, upload_path, secret)
             encrypted_key = add_encrypted_suffix(key)
             s3_client.upload_file(upload_path, f'{bucket}-encrypted', encrypted_key)
 
 # Define the function to encrypt the PDF file with a password
-def encrypt_pdf(file_path, encrypted_file_path):
+def encrypt_pdf(file_path, encrypted_file_path, secret):
     reader = PdfReader(file_path)
     writer = PdfWriter()
     
@@ -59,6 +68,7 @@ def encrypt_pdf(file_path, encrypted_file_path):
     # In this example, the password is hardcoded.
     # In a production application, don't hardcode passwords or other sensitive information.
     # We recommend you use AWS Secrets Manager to securely store passwords.
+    
     writer.encrypt(secret)
 
     # Save the new PDF to a file
