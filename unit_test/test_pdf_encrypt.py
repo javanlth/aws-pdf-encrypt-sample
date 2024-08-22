@@ -5,7 +5,7 @@ import pytest
 import time
 import os
 import sys
-sys.path.append(os.path.join(os.path.dirname(__file__), '..')
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from lambda_function import encrypt_pdf
 
 source_bucket_name = 'mocho'
