@@ -85,7 +85,7 @@ Enter the pipeline execution role ARN if you have previously created one, or we 
 Enter the CloudFormation execution role ARN if you have previously created one, or we will create one for you []:
 Please enter the artifact bucket ARN for your Lambda function. If you do not have a bucket, we will create one for you []:
 Does your application contain any IMAGE type Lambda functions? [y/N]: Y
-'''
+```
 
 Once bootstrapping is complete, navigate to .aws-sam/pipeline and open the pipelineconfig.toml file. Here you will find the ARNs that AWS SAM has configured for you.
 
