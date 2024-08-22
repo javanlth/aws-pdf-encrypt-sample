@@ -5,7 +5,7 @@ import json
 import pytest
 import time
 import os
-from ../lambda_function import encrypt_pdf
+from lambda_function import encrypt_pdf
 
 source_bucket_name = 'mocho'
 dest_bucket_name = source_bucket_name + '-encrypted'
