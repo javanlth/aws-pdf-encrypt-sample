@@ -28,8 +28,3 @@ def test_encrypt_working(file_path_to_encrypt):
         print("Error: could not encrypt file")
 
     assert file_encrypted, "Could not encrypt file"
-
-
-def test_cleanup(cleanup):
-    # This test uses the cleanup fixture and will be executed last
-    pass
