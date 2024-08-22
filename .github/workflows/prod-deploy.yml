@@ -9,7 +9,7 @@ env:
   SAM_TEMPLATE: template.yaml
   PROD_STACK_NAME: pdf-encrypt-prod
   PROD_REGION: ap-northeast-1
-  PROD_PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE_NAME }}
+  PROD_PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.PROD_PIPELINE_EXECUTION_ROLE_NAME }}
   PROD_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.PROD_CLOUDFORMATION_EXECUTION_ROLE_NAME }}
 
 permissions:
