@@ -35,6 +35,15 @@ jobs:
         run: |
             # trigger the tests here
 
+      - name: Test encrypt-pdf function locally
+        run: |
+
+          cd unit_test
+          pip install pytest
+          pip install -r requirements.txt
+          pytest -s -v
+          cd ..
+
   delete-feature:
     if: startsWith(github.event.ref, 'feature') && github.event_name == 'delete'
     runs-on: ubuntu-latest
