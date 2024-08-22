@@ -4,7 +4,9 @@ import json
 import pytest
 import time
 import os
-from ..lambda_function import encrypt_pdf
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..')
+from lambda_function import encrypt_pdf
 
 source_bucket_name = 'mocho'
 dest_bucket_name = source_bucket_name + '-encrypted'
