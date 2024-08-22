@@ -9,8 +9,8 @@ env:
   SAM_TEMPLATE: template.yaml
   TESTING_STACK_NAME: pdf-encrypt-dev
   TESTING_REGION: ap-northeast-1
-  PROD_STACK_NAME: pdf-encrypt-prod
-  PROD_REGION: ap-northeast-1
+  TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE_NAME }}
+  TESTING_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.TESTING_CLOUDFORMATION_EXECUTION_ROLE_NAME }}
 
 permissions:
   id-token: write
@@ -31,7 +31,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-region: ${{ env.TESTING_REGION }}
-          role-to-assume: ${{ secrets.TESTING_CLOUDFORMATION_EXECUTION_ROLE }}
+          role-to-assume: ${{ env.TESTING_CLOUDFORMATION_EXECUTION_ROLE }}
           role-session-name: give-s3-access
           role-duration-seconds: 3600
           role-skip-session-tagging: true
@@ -71,7 +71,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-region: ${{ env.TESTING_REGION }}
-          role-to-assume: ${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
           role-session-name: testing-packaging
           role-duration-seconds: 3600
           role-skip-session-tagging: true
@@ -107,7 +107,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-region: ${{ env.TESTING_REGION }}
-          role-to-assume: ${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
           role-session-name: testing-deployment
           role-duration-seconds: 3600
           role-skip-session-tagging: true
@@ -121,7 +121,7 @@ jobs:
             --s3-bucket ${{ secrets.TESTING_ARTIFACTS_BUCKET }} \
             --image-repository ${{ secrets.TESTING_IMAGE_REPOSITORY }} \
             --no-fail-on-empty-changeset \
-            --role-arn ${{ secrets.TESTING_CLOUDFORMATION_EXECUTION_ROLE }}
+            --role-arn ${{ env.TESTING_CLOUDFORMATION_EXECUTION_ROLE }}
 
       - name: create-json
         uses: jsdaniell/create-json@1.1.2
@@ -158,7 +158,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-region: ${{ env.TESTING_REGION }}
-          role-to-assume: ${{ secrets.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
           role-session-name: testing-deployment
           role-duration-seconds: 3600
           role-skip-session-tagging: true
