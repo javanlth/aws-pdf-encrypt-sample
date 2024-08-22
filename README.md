@@ -10,9 +10,9 @@ To be able to set this pipeline up for your use in your own repository, you will
 
 ### 1. Make a clone of this repository in your desired directory.
 
-'''
+```
 git clone https://github.com/javanlth/aws-pdf-encrypt-sample.git
-'''
+```
 
 ### 2. Have both the AWS CLI and the AWS SAM CLI installed.
 This presumes that you have already signed up for an AWS account and created an administrative IAM user.
@@ -109,16 +109,16 @@ These parameter values will be saved in your GitHub repository secrets for the w
 
 Copy the values from the files (omitting the "") and save them as the following secrets accordingly: (left: parameters in pipelineconfig.toml file, right: name of secrets variable)
 From [dev.pipeline_bootstrap.parameters]
-pipeline_execution_role (only the part after role/) --> TESTING_PIPELINE_EXECUTION_ROLE_NAME
-cloudformation_execution_role --> TESTING_CLOUDFORMATION_EXECUTION_ROLE
-artifacts_bucket --> TESTING_ARTIFACTS_BUCKET
+pipeline_execution_role (only the part after role/) --> TESTING_PIPELINE_EXECUTION_ROLE_NAME\n
+cloudformation_execution_role --> TESTING_CLOUDFORMATION_EXECUTION_ROLE\n
+artifacts_bucket --> TESTING_ARTIFACTS_BUCKET\n
 image_repository --> TESTING_IMAGE_REPOSITORY
 
 
 From [prod.pipeline_bootstrap.parameters]
-pipeline_execution_role (only the part after role/) --> PROD_PIPELINE_EXECUTION_ROLE_NAME
-cloudformation_execution_role --> PROD_CLOUDFORMATION_EXECUTION_ROLE
-artifacts_bucket --> PROD_ARTIFACTS_BUCKET
+pipeline_execution_role (only the part after role/) --> PROD_PIPELINE_EXECUTION_ROLE_NAME\n
+cloudformation_execution_role --> PROD_CLOUDFORMATION_EXECUTION_ROLE\n
+artifacts_bucket --> PROD_ARTIFACTS_BUCKET\n
 image_repository --> PROD_IMAGE_REPOSITORY
 
 ## Automated tests
@@ -138,13 +138,13 @@ Any errors detected during this stage could be due to insufficient access permis
 
 ## Using it
 
-Once the Lambda function has been successfully deployed onto the production stage of AWS, you may upload any PDF to the source S3 bucket by running the following command:
+Once the Lambda function has been successfully deployed onto the production stage of AWS, you may upload any PDF to the source S3 bucket by manually uploading to the bucket via the AWS console, or by running the following command:
 
 ```
 aws s3api put-object --bucket <NAME-OF-SOURCEBUCKET> --key <PDF-NAME>.pdf --body ./<PDF-NAME>.pdf
 ```
 
-The Lambda function has been configured to automatically run and encrypt the uploaded PDF, then upload the encrypted PDF into the destination S3 bucket. You may then download the encrypted PDF from the destination S3 bucket with the following command.
+The Lambda function has been configured to automatically run and encrypt the uploaded PDF, then upload the encrypted PDF into the destination S3 bucket. You may then download the encrypted PDF from the destination S3 bucket via the AWS console, or with the following command.
 
 ```
 aws s3api get-object --bucket <NAME-OF-SOURCEBUCKET>-encrypted --key <PDF-NAME>_encrypted.pdf <PDF-NAME>_encrypted.pdf
