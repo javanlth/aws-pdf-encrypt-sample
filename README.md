@@ -8,11 +8,9 @@ This function takes in any PDF file with name format \<name>.pdf that has been u
 
 To be able to set this pipeline up for your use in your own repository, you will need to do the following:
 
-### 1. Make a clone of this repository in your desired directory.
 
-```
-git clone https://github.com/javanlth/aws-pdf-encrypt-sample.git
-```
+### 1. Create a new repository.
+
 
 ### 2. Have both the AWS CLI and the AWS SAM CLI installed.
 This presumes that you have already signed up for an AWS account and created an administrative IAM user.
@@ -32,7 +30,7 @@ Next, to configure your security credentials for AWS CLI, refer to  [https://doc
 aws configure sso
 ```
 
-While configuring your security credentials, take note of your account ID and save it as the repository secret AWS_ACCOUNT_ID.
+While configuring your security credentials, take note of your account ID and save it as the repository secret AWS_ACCOUNT_ID in the newly created repository.
 
 Finally, to install AWS SAM CLI, follow the instructions on [https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html).
 
@@ -108,18 +106,36 @@ region = "ap-northeast-1"
 These parameter values will be saved in your GitHub repository secrets for the workflow files to refer to later.
 
 Copy the values from the files (omitting the "") and save them as the following secrets accordingly: (left: parameters in pipelineconfig.toml file, right: name of secrets variable)
+
+```
 From [dev.pipeline_bootstrap.parameters]
-pipeline_execution_role (only the part after role/) --> TESTING_PIPELINE_EXECUTION_ROLE_NAME\n
-cloudformation_execution_role --> TESTING_CLOUDFORMATION_EXECUTION_ROLE\n
-artifacts_bucket --> TESTING_ARTIFACTS_BUCKET\n
+pipeline_execution_role (only the part after role/) --> TESTING_PIPELINE_EXECUTION_ROLE_NAME
+cloudformation_execution_role --> TESTING_CLOUDFORMATION_EXECUTION_ROLE
+artifacts_bucket --> TESTING_ARTIFACTS_BUCKET
 image_repository --> TESTING_IMAGE_REPOSITORY
 
-
 From [prod.pipeline_bootstrap.parameters]
-pipeline_execution_role (only the part after role/) --> PROD_PIPELINE_EXECUTION_ROLE_NAME\n
-cloudformation_execution_role --> PROD_CLOUDFORMATION_EXECUTION_ROLE\n
-artifacts_bucket --> PROD_ARTIFACTS_BUCKET\n
+pipeline_execution_role (only the part after role/) --> PROD_PIPELINE_EXECUTION_ROLE_NAME
+cloudformation_execution_role --> PROD_CLOUDFORMATION_EXECUTION_ROLE
+artifacts_bucket --> PROD_ARTIFACTS_BUCKET
 image_repository --> PROD_IMAGE_REPOSITORY
+```
+### Setting the password for your PDFs
+The password that will be used to encrypt any PDFs uploaded will be configured as a AWS Secrets Manager secret. From the AWS console, go to AWS Secrets Manager > Store a new secret.
+
+Create a new secret with the name "pdf-password", then under key-value pairs, create an entry with the key "pdf-password", and the value your desired password.
+
+### 4. Getting the pipeline running on Github Actions
+
+Finally, to be able to run the Github Actions pipeline, clone this repository [https://github.com/javanlth/aws-pdf-encrypt-sample.git](https://github.com/javanlth/aws-pdf-encrypt-sample.git) and push a mirror onto the new repository you created back in Step 1.
+
+```
+git clone --bare https://github.com/javanlth/aws-pdf-encrypt-sample.git
+cd aws-pdf-encrypt-sample.git
+git push --mirror https://github.com/<your-username>/<NEW-REPOSITORY>.git
+cd ..
+rm -rf aws-pdf-encrypt-sample.git
+```
 
 ## Automated tests
 
