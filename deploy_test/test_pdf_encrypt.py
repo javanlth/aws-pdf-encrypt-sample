@@ -10,7 +10,7 @@ import os
 #for stack in stacks['StackSummaries']:
 #	stack_name = stack['StackName']
 #	print(stack_name)
-stack_name = os.environ['TESTING_STACK_NAME']
+stack_name = os.environ['TESTING_STACK_NAME'] # from Github Actions runner
 source_bucket_name = stack_name + '-' + 'mocho'
 dest_bucket_name = source_bucket_name + '-encrypted'
 
@@ -101,7 +101,7 @@ def test_lambda_invoked(logs_client):
 def test_encrypted_file_in_bucket(s3_client):
     # Specify the destination S3 bucket and the expected converted file key
     destination_bucket = dest_bucket_name
-    converted_file_key = '../test_encrypted.pdf'
+    converted_file_key = 'test_encrypted.pdf'
 
     try:
         # Attempt to retrieve the metadata of the converted file from the destination S3 bucket
