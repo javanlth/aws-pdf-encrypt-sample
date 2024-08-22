@@ -91,7 +91,7 @@ jobs:
   deploy-prod:
     #if: github.ref == 'refs/heads/main'
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    needs: [integration-test]
+    needs: [build-and-package-for-prod]
     runs-on: ubuntu-latest
     # Configure GitHub Action Environment to have a manual approval step before deployment to production
     # https://docs.github.com/en/actions/reference/environments
