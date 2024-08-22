@@ -1,6 +1,5 @@
 #pytest script to check encrypt_pdf function
 
-import boto3
 import json
 import pytest
 import time
