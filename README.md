@@ -121,6 +121,21 @@ cloudformation_execution_role --> PROD_CLOUDFORMATION_EXECUTION_ROLE
 artifacts_bucket --> PROD_ARTIFACTS_BUCKET
 image_repository --> PROD_IMAGE_REPOSITORY
 
+## Automated tests
+
+### Unit testing
+During the unit testing stage, the pipeline will run the pdf_encrypt function locally to ensure that the file can be successfully encrypted.
+
+The pipeline will only proceed to the deployment stage when this test has been passed.
+
+### Deployment stage testing
+During the deployment stage, the pipeline will check the following:
+1. The source S3 bucket is created.
+2. The Lambda function is invoked upon uploading a file to the source s3 bucket.
+3. The encrypted PDF can be downloaded from the destination bucket.
+
+Any errors detected during this stage could be due to insufficient access permissions for the execution role.
+
 ## Using it
 
 Once the Lambda function has been successfully deployed onto the production stage of AWS, you may upload any PDF to the source S3 bucket by running the following command:
