@@ -1,0 +1,149 @@
+name: Production Stage
+
+on:
+  workflow_run:
+    workflows: [Development Stage]
+    types: [completed]
+
+env:
+  SAM_TEMPLATE: template.yaml
+  PROD_STACK_NAME: pdf-encrypt-prod
+  PROD_REGION: ap-northeast-1
+  PROD_PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.PROD_PIPELINE_EXECUTION_ROLE_NAME }}
+  PROD_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.PROD_CLOUDFORMATION_EXECUTION_ROLE_NAME }}
+
+permissions:
+  id-token: write
+  contents: read
+jobs:
+
+  give-policy-access:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      #- name: install-aws-cli
+      #  uses: unfor19/install-aws-cli-action@v1
+
+      - name: Assume the CloudFormation role
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-region: ${{ env.PROD_REGION }}
+          role-to-assume: ${{ env.PROD_CLOUDFORMATION_EXECUTION_ROLE }}
+          role-session-name: give-policy-access
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+      - name: give deployment role full S3 access
+        run: |
+          aws iam attach-role-policy --role-name "${{ secrets.PROD_PIPELINE_EXECUTION_ROLE_NAME }}" --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
+
+      - name: give deployment role full Cloud Watch Logs access
+        run: |
+          aws iam attach-role-policy --role-name "${{ secrets.PROD_PIPELINE_EXECUTION_ROLE_NAME }}" --policy-arn arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+
+      - name: give deployment role full Lambda access
+        run: |
+          aws iam attach-role-policy --role-name "${{ secrets.PROD_PIPELINE_EXECUTION_ROLE_NAME }}" --policy-arn arn:aws:iam::aws:policy/AWSLambda_FullAccess
+
+
+  build-and-package-for-prod:
+    #if: github.ref == 'refs/heads/main' #Only runs if deployed to main branch
+    needs: [give-policy-access]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+
+      - name: Build resources for prod
+        run: sam build --template ${SAM_TEMPLATE} --use-container
+
+      - name: Assume the prod pipeline user role
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-region: ${{ env.PROD_REGION }}
+          role-to-assume: ${{ env.PROD_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: prod-packaging
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+      - name: Upload artifacts to production artifact buckets
+        run: |
+          sam package \
+            --s3-bucket ${{ secrets.PROD_ARTIFACTS_BUCKET }} \
+            --image-repository ${{ secrets.PROD_IMAGE_REPOSITORY }} \
+            --region ${PROD_REGION} \
+            --output-template-file packaged-prod.yaml
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: packaged-prod.yaml
+          path: packaged-prod.yaml
+
+
+
+
+
+  deploy-prod:
+    #if: github.ref == 'refs/heads/main'
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    needs: [build-and-package-for-prod]
+    runs-on: ubuntu-latest
+    # Configure GitHub Action Environment to have a manual approval step before deployment to production
+    # https://docs.github.com/en/actions/reference/environments
+    # environment: <configured-environment>
+    env:
+      user-role: prod
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+      - uses: actions/download-artifact@v3
+        with:
+          name: packaged-prod.yaml
+
+      - name: Assume the prod pipeline user role
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-region: ${{ env.PROD_REGION }}
+          role-to-assume: ${{ env.PROD_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: prod-deployment
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+      - name: Deploy to production account
+        run: |
+          sam deploy --stack-name ${PROD_STACK_NAME} \
+            --template packaged-prod.yaml \
+            --capabilities CAPABILITY_IAM \
+            --region ${PROD_REGION} \
+            --s3-bucket ${{ secrets.PROD_ARTIFACTS_BUCKET }} \
+            --image-repository ${{ secrets.PROD_IMAGE_REPOSITORY }} \
+            --no-fail-on-empty-changeset \
+            --role-arn ${{ env.PROD_CLOUDFORMATION_EXECUTION_ROLE }}
+
+
+      - name: create-json
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "notification.json"
+          json: '{"LambdaFunctionConfigurations": [{"Id": "EncryptPDFEventConfiguration","LambdaFunctionArn": "arn:aws:lambda:${{ env.PROD_REGION }}:${{ secrets.AWS_ACCOUNT_ID }}:function:${{ env.PROD_STACK_NAME }}-EncryptPDF","Events": ["s3:ObjectCreated:Put"]}]}'
+
+
+      - name: Give Lambda Function access rights to source S3 bucket
+        run: |
+          (aws lambda add-permission --function-name ${PROD_STACK_NAME}-EncryptPDF \
+            --principal s3.amazonaws.com --statement-id s3invoke --action "lambda:InvokeFunction" \
+            --source-arn arn:aws:s3:::${PROD_STACK_NAME}-mocho \
+            --source-account ${{ secrets.AWS_ACCOUNT_ID }}) || \
+            (echo "Permission already added")
+
+      - name: Configure notification by S3 bucket to Lambda Function
+        run: |
+          aws s3api put-bucket-notification-configuration --bucket ${PROD_STACK_NAME}-mocho \
+            --notification-configuration file://notification.json
